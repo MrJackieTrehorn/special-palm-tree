@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jackie Trehorn — Web & Graphic Design</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0e0e0e;
+    --bg2: #161616;
+    --bg3: #1e1e1e;
+    --border: #242424;
+    --text: #e4e4e4;
+    --muted: #777;
+    --dim: #444;
+    --accent: #c8ff00;
+    --font-sans: 'DM Sans', sans-serif;
+    --font-mono: 'DM Mono', monospace;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-sans);
+    font-weight: 300;
+    font-size: 15px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+    cursor: none;
+  }
+
+  a { color: inherit; text-decoration: none; }
+  img { display: block; width: 100%; height: auto; object-fit: cover; }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 8px; height: 8px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease, width 0.2s ease, height 0.2s ease, opacity 0.2s;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 32px; height: 32px;
+    border: 1px solid rgba(200,255,0,0.35);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.12s ease, width 0.25s ease, height 0.25s ease, opacity 0.25s, border-color 0.2s;
+  }
+  body.cursor-hover .cursor { width: 12px; height: 12px; }
+  body.cursor-hover .cursor-ring { width: 48px; height: 48px; border-color: rgba(200,255,0,0.6); }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='1'/%3E%3C/svg%3E");
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  /* Header */
+  header {
+    position: fixed; top: 0; left: 0; right: 0;
+    z-index: 500;
+    padding: 1.25rem 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    background: rgba(14,14,14,0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: 12px;
+    letter-spacing: 0.05em;
+    color: var(--text);
+  }
+  .logo span { color: var(--accent); }
+
+  nav { display: flex; gap: 2rem; align-items: center; }
+
+  nav a {
+    font-size: 11px;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    transition: color 0.2s;
+    position: relative;
+  }
+  nav a::after {
+    content: '';
+    position: absolute;
+    bottom: -2px; left: 0; right: 0;
+    height: 1px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transition: transform 0.2s ease;
+  }
+  nav a:hover { color: var(--text); }
+  nav a:hover::after { transform: scaleX(1); }
+
+  .nav-cta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    padding: 6px 16px;
+    border: 1px solid var(--dim);
+    border-radius: 2px;
+    color: var(--muted) !important;
+    letter-spacing: 0.1em;
+    transition: border-color 0.2s, color 0.2s !important;
+  }
+  .nav-cta:hover { border-color: var(--accent) !important; color: var(--accent) !important; }
+  .nav-cta::after { display: none !important; }
+
+  /* Hero */
+  .hero {
+    min-height: 100vh;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 9rem 2.5rem 5rem;
+    border-bottom: 1px solid var(--border);
+    position: relative; overflow: hidden;
+  }
+
+  .hero-watermark {
+    position: absolute;
+    top: 50%; left: -0.02em;
+    transform: translateY(-50%);
+    font-family: var(--font-mono);
+    font-size: clamp(120px, 20vw, 260px);
+    font-weight: 500;
+    color: transparent;
+    -webkit-text-stroke: 1px #1e1e1e;
+    letter-spacing: -0.04em;
+    line-height: 1;
+    pointer-events: none;
+    user-select: none;
+    white-space: nowrap;
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+
+  @keyframes drift {
+    from { transform: translateY(-50%) translateX(0); }
+    to   { transform: translateY(-50%) translateX(-1.5%); }
+  }
+
+  .hero-inner {
+    position: relative;
+    max-width: 1280px;
+    margin: 0 auto; width: 100%;
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: 5rem;
+    align-items: flex-end;
+  }
+
+  .hero-title {
+    font-size: clamp(52px, 7.5vw, 100px);
+    font-weight: 300;
+    line-height: 0.95;
+    letter-spacing: -0.035em;
+    opacity: 0;
+    transform: translateY(30px);
+    animation: fadeUp 0.9s ease 0.2s forwards;
+  }
+  .hero-title em { font-style: italic; color: var(--muted); }
+
+  .hero-right {
+    display: flex; flex-direction: column; gap: 2rem;
+    padding-bottom: 0.75rem;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: fadeUp 0.9s ease 0.45s forwards;
+  }
+
+  .hero-desc {
+    font-size: 14px;
+    color: var(--muted);
+    line-height: 1.8;
+    max-width: 360px;
+    border-left: 1px solid var(--border);
+    padding-left: 1.25rem;
+  }
+
+  .hero-tags {
+    display: flex; flex-wrap: wrap; gap: 6px;
+  }
+
+  .tag {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 2px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  .hero-scroll {
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+  .hero-scroll-line {
+    width: 40px; height: 1px;
+    background: var(--dim);
+    position: relative; overflow: hidden;
+  }
+  .hero-scroll-line::after {
+    content: '';
+    position: absolute;
+    top: 0; left: -100%;
+    width: 100%; height: 100%;
+    background: var(--accent);
+    animation: scanline 2s ease-in-out 1.5s infinite;
+  }
+  @keyframes scanline {
+    0%   { left: -100%; }
+    50%  { left: 0%; }
+    100% { left: 100%; }
+  }
+
+  @keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Section */
+  section { padding: 6rem 2.5rem; border-bottom: 1px solid var(--border); }
+
+  .section-top {
+    max-width: 1280px; margin: 0 auto;
+    display: flex; align-items: center; justify-content: space-between;
+    padding-bottom: 3rem;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 3rem;
+  }
+
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--dim);
+  }
+
+  .section-count {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.1em;
+  }
+
+  /* Gallery */
+  .gallery-wrap { max-width: 1280px; margin: 0 auto; }
+
+  .gallery-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 1px;
+    background: var(--border);
+  }
+
+  .gallery-item {
+    background: var(--bg);
+    overflow: hidden;
+    position: relative;
+    opacity: 0;
+    transform: translateY(16px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+  }
+  .gallery-item.visible { opacity: 1; transform: translateY(0); }
+
+  .gallery-item:nth-child(1) { grid-column: span 7; }
+  .gallery-item:nth-child(2) { grid-column: span 5; }
+  .gallery-item:nth-child(3) { grid-column: span 4; }
+  .gallery-item:nth-child(4) { grid-column: span 4; }
+  .gallery-item:nth-child(5) { grid-column: span 4; }
+  .gallery-item:nth-child(6) { grid-column: span 6; }
+  .gallery-item:nth-child(7) { grid-column: span 6; }
+
+  .gallery-thumb-wrap {
+    width: 100%;
+    aspect-ratio: 4/3;
+    overflow: hidden;
+    background: var(--bg3);
+    position: relative;
+  }
+
+  .gallery-thumb-wrap img {
+    width: 100%; height: 100%;
+    object-fit: cover;
+    filter: grayscale(15%) brightness(0.9);
+    transition: transform 0.6s cubic-bezier(0.25,0.46,0.45,0.94), filter 0.4s ease;
+  }
+
+  .gallery-item:hover .gallery-thumb-wrap img {
+    transform: scale(1.06);
+    filter: grayscale(0%) brightness(1);
+  }
+
+  /* placeholder colors for demo */
+  .gallery-item:nth-child(1) .gallery-thumb-wrap { background: #1a1a18; }
+  .gallery-item:nth-child(2) .gallery-thumb-wrap { background: #181a18; }
+  .gallery-item:nth-child(3) .gallery-thumb-wrap { background: #1a1818; }
+  .gallery-item:nth-child(4) .gallery-thumb-wrap { background: #18181a; }
+  .gallery-item:nth-child(5) .gallery-thumb-wrap { background: #1a1a16; }
+  .gallery-item:nth-child(6) .gallery-thumb-wrap { background: #161a1a; }
+  .gallery-item:nth-child(7) .gallery-thumb-wrap { background: #1a1618; }
+
+  .gallery-placeholder-inner {
+    width: 100%; height: 100%;
+    display: flex; align-items: center; justify-content: center;
+    position: absolute; inset: 0;
+  }
+  .gallery-placeholder-inner span {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    color: var(--dim);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .gallery-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.82) 0%, transparent 55%);
+    opacity: 0;
+    transition: opacity 0.35s ease;
+    display: flex; flex-direction: column; justify-content: flex-end;
+    padding: 1.25rem 1.5rem;
+    pointer-events: none;
+  }
+  .gallery-item:hover .gallery-overlay { opacity: 1; }
+
+  .gallery-overlay h3 {
+    font-size: 14px; font-weight: 400;
+    color: #fff; margin-bottom: 4px;
+    transform: translateY(6px);
+    transition: transform 0.3s ease 0.05s;
+  }
+  .gallery-overlay p {
+    font-family: var(--font-mono);
+    font-size: 10px; color: var(--accent);
+    letter-spacing: 0.1em; text-transform: uppercase;
+    transform: translateY(6px);
+    transition: transform 0.3s ease 0.1s;
+  }
+  .gallery-item:hover .gallery-overlay h3,
+  .gallery-item:hover .gallery-overlay p { transform: translateY(0); }
+
+  .gallery-item a { display: block; }
+
+  /* Stats bar */
+  .stats {
+    max-width: 1280px; margin: 3rem auto 0;
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    border: 1px solid var(--border); border-radius: 2px;
+  }
+
+  .stat {
+    padding: 1.5rem 2rem;
+    border-right: 1px solid var(--border);
+  }
+  .stat:last-child { border-right: none; }
+
+  .stat-num {
+    font-family: var(--font-mono);
+    font-size: 32px; font-weight: 300;
+    color: var(--text); line-height: 1;
+    margin-bottom: 6px;
+  }
+  .stat-num span { color: var(--accent); font-size: 20px; }
+
+  .stat-label {
+    font-size: 12px; color: var(--muted);
+    letter-spacing: 0.04em;
+  }
+
+  /* Contact */
+  .contact-inner {
+    max-width: 1280px; margin: 0 auto;
+    display: grid; grid-template-columns: 1fr 1fr;
+    gap: 6rem; align-items: center;
+  }
+
+  .contact-heading {
+    font-size: clamp(36px, 5vw, 64px);
+    font-weight: 300;
+    letter-spacing: -0.025em;
+    line-height: 1.05;
+  }
+  .contact-heading em { font-style: italic; color: var(--muted); }
+
+  .contact-links {
+    display: flex; flex-direction: column; gap: 0;
+  }
+
+  .contact-link {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+    transition: padding-left 0.25s ease;
+  }
+  .contact-link:first-child { border-top: 1px solid var(--border); }
+  .contact-link:hover { padding-left: 0.75rem; }
+
+  .contact-link-label {
+    font-family: var(--font-mono);
+    font-size: 11px; color: var(--dim);
+    letter-spacing: 0.1em; text-transform: uppercase;
+  }
+
+  .contact-link-value {
+    font-size: 14px; color: var(--muted);
+    transition: color 0.2s;
+  }
+  .contact-link:hover .contact-link-value { color: var(--accent); }
+
+  .contact-arrow {
+    color: var(--dim); font-size: 14px;
+    transition: color 0.2s, transform 0.2s;
+  }
+  .contact-link:hover .contact-arrow { color: var(--accent); transform: translateX(4px); }
+
+  /* Footer */
+  footer {
+    padding: 1.5rem 2.5rem;
+    display: flex; align-items: center; justify-content: space-between;
+    flex-wrap: wrap; gap: 1rem;
+  }
+
+  .footer-copy {
+    font-family: var(--font-mono);
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.08em;
+  }
+
+  .footer-links { display: flex; gap: 1.5rem; }
+  .footer-links a {
+    font-family: var(--font-mono);
+    font-size: 10px; color: var(--dim);
+    letter-spacing: 0.08em; text-transform: uppercase;
+    transition: color 0.2s;
+  }
+  .footer-links a:hover { color: var(--accent); }
+
+  /* Responsive */
+  @media (max-width: 900px) {
+    .hero-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+    .gallery-item:nth-child(n) { grid-column: span 12; }
+    .contact-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .stats { grid-template-columns: 1fr; }
+    .stat { border-right: none; border-bottom: 1px solid var(--border); }
+    .stat:last-child { border-bottom: none; }
+    body { cursor: auto; }
+    .cursor, .cursor-ring { display: none; }
+  }
+
+  @media (max-width: 600px) {
+    header { padding: 1rem 1.25rem; }
+    .hero { padding: 8rem 1.25rem 4rem; }
+    section { padding: 4rem 1.25rem; }
+    footer { padding: 1.25rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- Header -->
+<header>
+  <div class="logo">Jackie Trehorn<span>.</span></div>
+  <nav>
+    <a href="#work">Work</a>
+    <a href="#contact">Contact</a>
+    <a href="mailto:hello@jackietrehorn.com" class="nav-cta">Hire me</a>
+  </nav>
+</header>
+
+<!-- Hero -->
+<section class="hero" id="home">
+  <div class="hero-watermark" aria-hidden="true">JT</div>
+  <div class="hero-inner">
+    <h1 class="hero-title">
+      Jackie<br><em>Trehorn</em>
+    </h1>
+    <div class="hero-right">
+      <p class="hero-desc">
+        Web &amp; graphic designer crafting considered digital experiences. Based in Los Angeles — available worldwide.
+      </p>
+      <div class="hero-tags">
+        <span class="tag">Brand Identity</span>
+        <span class="tag">Web Design</span>
+        <span class="tag">Art Direction</span>
+        <span class="tag">UI / UX</span>
+        <span class="tag">Print</span>
+      </div>
+      <div class="hero-scroll">
+        <div class="hero-scroll-line"></div>
+        Scroll to explore
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Gallery -->
+<section id="work">
+  <div class="section-top">
+    <span class="section-label">Selected Projects</span>
+    <span class="section-count">07 works</span>
+  </div>
+  <div class="gallery-wrap">
+    <div class="gallery-grid">
+
+      <div class="gallery-item">
+        <a href="#">
+          <div class="gallery-thumb-wrap">
+            <div class="gallery-placeholder-inner"><span>Add image</span></div>
+          </div>
+          <div class="gallery-overlay">
+            <h3>Brand Overhaul — Studio Norte</h3>
+            <p>Brand Identity</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="gallery-item">
+        <a href="#">
+          <div class="gallery-thumb-wrap">
+            <div class="gallery-placeholder-inner"><span>Add image</span></div>
+          </div>
+          <div class="gallery-overlay">
+            <h3>Editorial System — Forma Mag</h3>
+            <p>Print Design</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="gallery-item">
+        <a href="#">
+          <div class="gallery-thumb-wrap">
+            <div class="gallery-placeholder-inner"><span>Add image</span></div>
+          </div>
+          <div class="gallery-overlay">
+            <h3>Product Site — Lumen Co.</h3>
+            <p>Web Design</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="gallery-item">
+        <a href="#">
+          <div class="gallery-thumb-wrap">
+            <div class="gallery-placeholder-inner"><span>Add image</span></div>
+          </div>
+          <div class="gallery-overlay">
+            <h3>Campaign — Drift Apparel</h3>
+            <p>Art Direction</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="gallery-item">
+        <a href="#">
+          <div class="gallery-thumb-wrap">
+            <div class="gallery-placeholder-inner"><span>Add image</span></div>
+          </div>
+          <div class="gallery-overlay">
+            <h3>UI Design — Vault App</h3>
+            <p>UI / UX</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="gallery-item">
+        <a href="#">
+          <div class="gallery-thumb-wrap">
+            <div class="gallery-placeholder-inner"><span>Add image</span></div>
+          </div>
+          <div class="gallery-overlay">
+            <h3>Identity — Crest Studio</h3>
+            <p>Brand Identity</p>
+          </div>
+        </a>
+      </div>
+
+      <div class="gallery-item">
+        <a href="#">
+          <div class="gallery-thumb-wrap">
+            <div class="gallery-placeholder-inner"><span>Add image</span></div>
+          </div>
+          <div class="gallery-overlay">
+            <h3>Web Presence — Aldea Hotel</h3>
+            <p>Web Design</p>
+          </div>
+        </a>
+      </div>
+
+    </div>
+
+    <!-- Stats -->
+    <div class="stats">
+      <div class="stat">
+        <div class="stat-num">7<span>+</span></div>
+        <div class="stat-label">Years experience</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">40<span>+</span></div>
+        <div class="stat-label">Clients worldwide</div>
+      </div>
+      <div class="stat">
+        <div class="stat-num">24</div>
+        <div class="stat-label">Projects completed</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- Contact -->
+<section id="contact">
+  <div class="contact-inner">
+    <div>
+      <h2 class="contact-heading">Let's make<br><em>something</em><br>great.</h2>
+    </div>
+    <div class="contact-links">
+      <a href="mailto:hello@jackietrehorn.com" class="contact-link">
+        <span class="contact-link-label">Email</span>
+        <span class="contact-link-value">hello@jackietrehorn.com</span>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://instagram.com" target="_blank" rel="noopener" class="contact-link">
+        <span class="contact-link-label">Instagram</span>
+        <span class="contact-link-value">@jackietrehorn</span>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://linkedin.com" target="_blank" rel="noopener" class="contact-link">
+        <span class="contact-link-label">LinkedIn</span>
+        <span class="contact-link-value">Jackie Trehorn</span>
+        <span class="contact-arrow">→</span>
+      </a>
+      <a href="https://behance.net" target="_blank" rel="noopener" class="contact-link">
+        <span class="contact-link-label">Behance</span>
+        <span class="contact-link-value">jackietrehorn</span>
+        <span class="contact-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer>
+  <p class="footer-copy">&copy; 2026 Jackie Trehorn. All rights reserved.</p>
+  <div class="footer-links">
+    <a href="#home">Top</a>
+    <a href="#work">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+  });
+
+  (function animRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
+
+  document.querySelectorAll('a, button').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+
+  // Scroll reveal gallery
+  const items = document.querySelectorAll('.gallery-item');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach((e, i) => {
+      if (e.isIntersecting) {
+        setTimeout(() => e.target.classList.add('visible'), e.target.dataset.delay || 0);
+        obs.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.08 });
+
+  items.forEach((item, i) => {
+    item.dataset.delay = i * 70;
+    obs.observe(item);
+  });
+</script>
+</body>
+</html>
